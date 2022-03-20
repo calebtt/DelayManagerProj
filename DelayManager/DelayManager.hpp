@@ -8,8 +8,9 @@ namespace sds::Utilities
 	//using declarations, aliases
 	namespace chron = std::chrono;
 	using TimeType = chron::nanoseconds;
-	using TimePointType = chron::time_point <chron::high_resolution_clock, chron::nanoseconds>;
 	using ClockType = chron::high_resolution_clock;
+	using TimePointType = chron::time_point <ClockType, TimeType>;
+	
 
 	//concept for template type convertible to TimeType
 	template<typename T>

@@ -13,7 +13,7 @@ void CopyDelay(DelayManager<T> timer, const auto interval)
 	while (!timer.IsElapsed())
 	{
 		std::this_thread::sleep_for(interval);
-		std::cout << "Tick..." << std::endl;
+		std::cout << "Tick..." << '\n';
 	}
 }
 
