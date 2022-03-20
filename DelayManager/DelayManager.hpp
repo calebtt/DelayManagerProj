@@ -25,7 +25,6 @@ namespace sds::Utilities
 		TimeType m_nanos{};
 		bool m_has_fired{ false };
 	public:
-		//us is microseconds
 		DelayManager() = delete;
 		explicit DelayManager(DurationType duration) noexcept requires IsDuration<DurationType> : m_nanos(duration) { }
 		DelayManager(const DelayManager& other) = default;
