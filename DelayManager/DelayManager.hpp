@@ -27,10 +27,10 @@ namespace sds::Utilities
 		//us is microseconds
 		DelayManager() = delete;
 		explicit DelayManager(DurationType duration) noexcept requires IsDuration<DurationType> : m_nanos(duration) { }
-		DelayManager(const DelayManager& other) = delete;
-		DelayManager(DelayManager&& other) = delete;
-		DelayManager& operator=(const DelayManager& other) = delete;
-		DelayManager& operator=(DelayManager&& other) = delete;
+		DelayManager(const DelayManager& other) = default;
+		DelayManager(DelayManager&& other) = default;
+		DelayManager& operator=(const DelayManager& other) = default;
+		DelayManager& operator=(DelayManager&& other) = default;
 		~DelayManager() = default;
 		/// <summary>Operator<< overload for ostream specialization,
 		///	writes more detailed delay details for debugging.
