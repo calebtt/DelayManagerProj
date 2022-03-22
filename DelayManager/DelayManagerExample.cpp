@@ -31,7 +31,7 @@ void RunDelayLoopWithRefObj(DelayManagerSafe<T> &timer, const auto interval)
 	{
 		std::this_thread::sleep_for(interval);
 		std::osyncstream oss(std::cout);
-		oss << "Tick... " << timer << "From Thread Id : " << std::this_thread::get_id() << '\n';
+		oss << "Tick... " << timer << "From Thread Id : " << std::this_thread::get_id() << newl;
 		oss.emit();
 	}
 }
@@ -75,10 +75,10 @@ void RunMultiThreadedTest()
 }
 
 void RunSingleThreadedTest(); // below
-
 template<typename T>
 void RunDelayLoopWithCopiedObj(DelayManager<T> timer, const auto interval);
 
+/* ENTRY POINT */
 int main()
 {
 	std::osyncstream oss(std::cout);
@@ -102,7 +102,7 @@ void RunDelayLoopWithCopiedObj(DelayManager<T> timer, const auto interval)
 	{
 		std::this_thread::sleep_for(interval);
 		std::osyncstream oss(std::cout);
-		oss << "Tick..." << newl;
+		oss << "Tick..." << timer << newl;
 		oss.emit();
 	}
 }
