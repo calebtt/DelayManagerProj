@@ -2,15 +2,16 @@
 #include <ostream>
 #include <chrono>
 #include <syncstream>
-
-namespace sds::Utilities
+#include <mutex>
+//includes some type aliases and a concept to make it single header, class DelayManager
+namespace DelayManagement
 {
 	//using declarations, aliases
 	namespace chron = std::chrono;
 	using TimeType = chron::nanoseconds;
 	using ClockType = chron::high_resolution_clock;
 	using TimePointType = chron::time_point <ClockType, TimeType>;
-	
+
 
 	//concept for template type convertible to TimeType
 	template<typename T>
@@ -19,7 +20,7 @@ namespace sds::Utilities
 	/// <summary> DelayManager manages a time delay, it provides functions such as IsElapsed() and Reset(...) </summary>
 	/// <typeparam name="DurationType">Chrono type convertible to nanoseconds</typeparam>
 	template<typename DurationType>
-	class DelayManager
+	class DelayManager final
 	{
 		TimePointType m_start_time{ ClockType::now() };
 		TimeType m_nanos{};
@@ -64,4 +65,5 @@ namespace sds::Utilities
 			m_nanos = nanosec_delay;
 		}
 	};
+	
 }
