@@ -32,14 +32,14 @@ namespace DelayManagementThreadSafe
 	private:
 		/// <summary> Helper to lock a mutex, if there is a mutex. Blocking. </summary>
 		/// <throws> may throw a std::system_error when errors occur, including errors from the OS. </throws>
-		void StartCriticalSection(const DelayManagerSafe &other)
+		static void StartCriticalSection(const DelayManagerSafe &other)
 		{
 			if (other.m_invariant_mutex)
 				other.m_invariant_mutex->lock();
 		}
 		/// <summary> Helper to unlock a mutex, if there is a mutex. </summary>
 		///	<throws> may throw a std::system_error when errors occur, including errors from the OS. </throws>
-		void StopCriticalSection(const DelayManagerSafe& other)
+		static void StopCriticalSection(const DelayManagerSafe& other)
 		{
 			if (other.m_invariant_mutex)
 				other.m_invariant_mutex->unlock();
@@ -109,14 +109,15 @@ namespace DelayManagementThreadSafe
 		///	are wrapped with osyncstream!</summary>
 		friend std::ostream& operator<<(std::ostream& os, const DelayManagerSafe& obj) noexcept
 		{
-			StartCriticalSection(obj);
+			static constexpr char newl{ '\n' };
+			obj.StartCriticalSection(obj);
 			std::osyncstream ss(os);
-			ss << "[DelayManagerSafe]" << std::endl
-				<< "m_start_time:" << obj.m_start_time.time_since_epoch() << std::endl
-				<< "m_nanos:" << obj.m_nanos << std::endl
-				<< "m_has_fired:" << obj.m_has_fired << std::endl
-				<< "[/DelayManagerSafe]";
-			StopCriticalSection(obj);
+			ss << "[DelayManagerSafe]" << newl
+			<< "m_start_time:" << obj.m_start_time.time_since_epoch() << newl
+			<< "m_nanos:" << obj.m_nanos << " in seconds: ~" << chron::duration_cast<chron::seconds>(obj.m_nanos) << newl
+			<< "m_has_fired:" << obj.m_has_fired << newl
+			<< "[/DelayManagerSafe]";
+			obj.StopCriticalSection(obj);
 			return os;
 		}
 		/// <summary>Check for elapsed.</summary>

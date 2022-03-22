@@ -2,9 +2,10 @@
 //
 
 #include <iostream>
-#include <vector>
-#include <thread>
 #include <syncstream>
+#include <memory>
+#include <vector>
+
 #include "DelayManager.hpp"
 #include "DelayManagerSafe.hpp"
 
@@ -23,7 +24,7 @@ void RunDelayLoopWithRefObj(DelayManagerSafe<T> &timer, const auto interval)
 	{
 		std::this_thread::sleep_for(interval);
 		std::osyncstream oss(std::cout);
-		oss << "Tick... From Thread Id: "<< std::this_thread::get_id() << '\n';
+		oss << "Tick... " << timer << "From Thread Id : " << std::this_thread::get_id() << '\n';
 		oss.emit();
 	}
 }
