@@ -361,3 +361,17 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/DelayManager-oovaide/oovaide.txt
+/DelayManager-oovaide/oovaide-tmp-compsources.txt
+/DelayManager-oovaide/oovaide-tmp-buildconfig.txt
+/DelayManager-oovaide/oovaide-pkg.txt
+/DelayManager-oovaide/oovaide-gui.txt
+/DelayManager-oovaide/analysis-22790/oovaide-incdeps.txt
+/DelayManager-oovaide/analysis-22790/DelayManager_dhpp.xmi
+/DelayManager-oovaide/analysis-22790/DelayManager_dhpp-err.txt
+/DelayManager-oovaide/analysis-22790/DelayManagerSafe_dhpp.xmi
+/DelayManager-oovaide/analysis-22790/DelayManagerSafe_dhpp-err.txt
+/DelayManager-oovaide/analysis-22790/DelayManagerExample_dcpp.xmi
+/DelayManager-oovaide/analysis-22790/DelayManagerExample_dcpp-err.txt
+/DelayManager-oovaide/analysis-22790
+/DelayManager-oovaide

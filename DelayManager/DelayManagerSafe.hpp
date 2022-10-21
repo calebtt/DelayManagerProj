@@ -19,7 +19,7 @@ namespace DelayManagementThreadSafe
 	template<typename T>
 	concept IsDuration = std::is_convertible_v<T, TimeType>;
 
-	/// <summary> DelayManagerSafe manages a time delay, it provides functions such as IsElapsed() and Reset(...)
+	/// <summary> DelayManagerSafe manages a non-blocking time delay, it provides functions such as IsElapsed() and Reset(...)
 	/// This is the thread-safe variant of this class. </summary>
 	/// <typeparam name="DurationType">Chrono type convertible to nanoseconds</typeparam>
 	template<typename DurationType = chron::nanoseconds>
