@@ -1,6 +1,7 @@
 // DelayManager.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
+#include <cassert>
 #include <iostream>
 #include <syncstream>
 #include <memory>
@@ -14,10 +15,12 @@ static constexpr auto newl = '\n';
 static constexpr auto TickInterval = chron::milliseconds(500);
 using DelayManagementThreadSafe::DelayManagerSafe;
 using DelayManagement::DelayManager;
-using SharedThreadType = std::shared_ptr<std::thread>;
+using Thread_t = std::jthread;
+using SharedThreadType = std::shared_ptr<Thread_t>;
+
 
 //Program settings
-static constexpr size_t ThreadCount{ 200 }; // num threads
+static constexpr size_t ThreadCount{ 20 }; // num threads
 static constexpr chron::seconds FirstDelay{ 5 }; // initial delay given to the tick loop
 static constexpr chron::seconds UpdatedDelay{ 10 }; // value the delay is updated to, after the time to wait
 static constexpr chron::seconds TimeToWait{ 2 }; // time to wait before updating (calling Reset() on the DelayManager)
@@ -36,25 +39,41 @@ void DelayManagementConceptTest(DelayManagement::IsDelayManager auto obj)
 {
 	//empty
 }
+
+void RunResetTest()
+{
+	DelayManagement::DelayManager<> dm{ std::chrono::milliseconds{1000} };
+	dm.Reset(std::chrono::nanoseconds{ 100 });
+	std::this_thread::sleep_for(std::chrono::seconds(2));
+	assert(dm.IsElapsed());
+	dm.Reset(std::chrono::seconds{ 10 });
+	assert(!dm.IsElapsed());
+	dm.Reset();
+	dm.Reset(1);
+}
 /* ENTRY POINT */
 int main()
 {
 	using namespace std::chrono_literals;
+	std::string buffer;
 	//Concept test, ensuring both/all variants pass the concept check.
 	DelayManagementConceptTest(DelayManagement::DelayManager<>{1s});
 	DelayManagementConceptTest(DelayManagementThreadSafe::DelayManagerSafe<>{1s});
+	RunResetTest();
 
 	std::osyncstream oss(std::cout);
+	oss << "[ENTER] to run single threaded test...\n";
+	oss.emit();
+	std::getline(std::cin, buffer);
 	RunSingleThreadedTest();
 	oss << std::format("[ENTER] to continue creating {0} threads with a {1} second delay, and then Reset() the delay to {2} seconds, after {3} seconds.\n"
 		, ThreadCount, FirstDelay, UpdatedDelay, TimeToWait);
 	oss.emit();
-	std::cin.get();
+	std::getline(std::cin, buffer);
 	RunMultiThreadedTest();
 	oss << "[ENTER] to exit." << newl;
 	oss.emit();
-	std::cin.clear();
-	std::cin.get();
+	std::getline(std::cin, buffer);
 }
 
 void RunDelayLoopWithRefObj(DelayManagement::IsDelayManager auto &timer, const auto interval)
@@ -92,10 +111,10 @@ void RunMultiThreadedTest()
 	auto DoDelayAndUpdateLoop = [&](auto& mtt)
 	{
 		std::osyncstream oss(std::cout);
-		std::shared_ptr<std::thread> loopThread = std::make_shared<std::thread>([&]() { RunDelayLoopWithRefObj(mtt, TickInterval); });
+		std::shared_ptr<Thread_t> loopThread = std::make_shared<Thread_t>([&]() { RunDelayLoopWithRefObj(mtt, TickInterval); });
 		oss << "Running multi-threaded delay loop.. From thread: " << loopThread->get_id() << newl;
 		//so while the loopThread is running, it will update the delaymanager object with a new duration value
-		std::shared_ptr<std::thread> updateThread = std::make_shared<std::thread>([&]() { RunDelayedTimerUpdate(mtt, UpdatedDelay, TimeToWait); });
+		std::shared_ptr<Thread_t> updateThread = std::make_shared<Thread_t>([&]() { RunDelayedTimerUpdate(mtt, UpdatedDelay, TimeToWait); });
 		oss << "Running multi-threaded delay update.. From thread: " << updateThread->get_id() << newl;
 		oss.emit();
 		return std::make_pair(loopThread, updateThread); // pair of threads
@@ -127,5 +146,5 @@ void RunSingleThreadedTest()
 		RunDelayLoopWithCopiedObj(timer, interval);
 	};
 	DoLoop(chron::seconds(5), chron::seconds(1));
-	DoLoop(chron::milliseconds(1000), chron::milliseconds(100));
+	DoLoop(chron::milliseconds(1000), chron::milliseconds(250));
 }
