@@ -42,14 +42,15 @@ void DelayManagementConceptTest(DelayManagement::IsDelayManager auto obj)
 
 void RunResetTest()
 {
-	DelayManagement::DelayManager<> dm{ std::chrono::milliseconds{1000} };
+	using namespace std::chrono_literals;
+	DelayManagement::DelayManager dm{ std::chrono::milliseconds{1000} };
 	dm.Reset(std::chrono::nanoseconds{ 100 });
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 	assert(dm.IsElapsed());
 	dm.Reset(std::chrono::seconds{ 10 });
 	assert(!dm.IsElapsed());
 	dm.Reset();
-	dm.Reset(1);
+	dm.Reset(1s);
 }
 /* ENTRY POINT */
 int main()
@@ -57,7 +58,7 @@ int main()
 	using namespace std::chrono_literals;
 	std::string buffer;
 	//Concept test, ensuring both/all variants pass the concept check.
-	DelayManagementConceptTest(DelayManagement::DelayManager<>{1s});
+	DelayManagementConceptTest(DelayManagement::DelayManager{1s});
 	DelayManagementConceptTest(DelayManagementThreadSafe::DelayManagerSafe<>{1s});
 	RunResetTest();
 
