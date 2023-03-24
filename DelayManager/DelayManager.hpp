@@ -26,7 +26,7 @@ namespace DelayManagement
 	{
 		TimePoint_t m_start_time{ Clock_t::now() };
 		Nanos_t m_delayTime{}; // this should remain nanoseconds to ensure maximum granularity when Reset() with a different type.
-		bool m_has_fired{ false };
+		mutable bool m_has_fired{ false };
 	public:
 		DelayManager() = delete;
 		explicit DelayManager(Nanos_t duration) noexcept : m_delayTime(duration) { }
@@ -54,7 +54,7 @@ namespace DelayManagement
 		/// Check for elapsed.
 		/// </summary>
 		[[nodiscard]]
-		bool IsElapsed() noexcept
+		bool IsElapsed() const noexcept
 		{
 			if (Clock_t::now() > (m_start_time + m_delayTime))
 			{
