@@ -18,10 +18,14 @@ namespace DelayManagement
 		{ T(std::chrono::seconds(1)) };
 		{ t.IsElapsed() } -> std::convertible_to<bool>;
 		{ t.Reset(std::chrono::seconds{ 5 }) };
+		{ t.Reset() };
+		{ t.GetTimerPeriod() } -> std::convertible_to<Nanos_t>;
 		{ std::cout << t };
 	};
 
-	/// <summary> DelayManager manages a non-blocking time delay, it provides functions such as IsElapsed() and Reset(...) </summary>
+	/**
+	 * \brief	DelayManager manages a non-blocking time delay, it provides functions such as IsElapsed() and Reset(...)
+	 */
 	class DelayManager final
 	{
 		TimePoint_t m_start_time{ Clock_t::now() };
@@ -35,12 +39,9 @@ namespace DelayManagement
 		DelayManager& operator=(const DelayManager& other) = default;
 		DelayManager& operator=(DelayManager&& other) = default;
 		~DelayManager() = default;
-		/// <summary>
-		/// Operator<< overload for ostream specialization,
-		///	writes more detailed delay details for debugging.
-		///	Thread-safe, provided all writes to the ostream object
-		///	are wrapped with osyncstream!
-		///	</summary>
+		/**
+		 * \brief	Operator<< overload for ostream specialization, writes more detailed delay details for debugging.
+		 */
 		friend std::ostream& operator<<(std::ostream& os, const DelayManager& obj) noexcept
 		{
 			os << "[DelayManager]" << '\n'
@@ -50,9 +51,10 @@ namespace DelayManagement
 				<< "[/DelayManager]";
 			return os;
 		}
-		/// <summary>
-		/// Check for elapsed.
-		/// </summary>
+		/**
+		 * \brief	Check for elapsed.
+		 * \return	true if timer has elapsed, false otherwise
+		 */
 		[[nodiscard]]
 		bool IsElapsed() const noexcept
 		{
@@ -63,22 +65,30 @@ namespace DelayManagement
 			}
 			return false;
 		}
-		/// <summary>
-		/// Reset timer with chrono duration type.
-		/// </summary>
+		/**
+		 * \brief	Reset timer with chrono duration type.
+		 * \param delay		Delay in nanoseconds (or any std::chrono duration type)
+		 */
 		void Reset(const Nanos_t delay) noexcept
 		{
 			m_start_time = Clock_t::now();
 			m_has_fired = false;
 			m_delayTime = { delay };
 		}
-		/// <summary>
-		/// Reset timer to last used duration value for a new start point.
-		/// </summary>
+		/**
+		 * \brief	Reset timer to last used duration value for a new start point.
+		 */
 		void Reset() noexcept
 		{
 			m_start_time = Clock_t::now();
 			m_has_fired = false;
+		}
+		/**
+		 * \brief	Gets the current timer period/duration for elapsing.
+		 */
+		auto GetTimerPeriod() const
+		{
+			return m_delayTime;
 		}
 	};
 	
