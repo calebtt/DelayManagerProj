@@ -23,8 +23,5 @@
     <ClInclude Include="DelayManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DelayManagerSafe.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

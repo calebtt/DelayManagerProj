@@ -8,12 +8,9 @@
 #include <vector>
 
 #include "DelayManager.hpp"
-#include "DelayManagerSafe.hpp"
 
 namespace chron = std::chrono;
 static constexpr auto newl = '\n';
-static constexpr auto TickInterval = chron::milliseconds(500);
-using DelayManagementThreadSafe::DelayManagerSafe;
 using DelayManagement::DelayManager;
 using Thread_t = std::jthread;
 using SharedThreadType = std::shared_ptr<Thread_t>;
@@ -59,7 +56,6 @@ int main()
 	std::string buffer;
 	//Concept test, ensuring both/all variants pass the concept check.
 	DelayManagementConceptTest(DelayManagement::DelayManager{1s});
-	DelayManagementConceptTest(DelayManagementThreadSafe::DelayManagerSafe<>{1s});
 	RunResetTest();
 
 	std::osyncstream oss(std::cout);
@@ -71,7 +67,6 @@ int main()
 		, ThreadCount, FirstDelay, UpdatedDelay, TimeToWait);
 	oss.emit();
 	std::getline(std::cin, buffer);
-	RunMultiThreadedTest();
 	oss << "[ENTER] to exit." << newl;
 	oss.emit();
 	std::getline(std::cin, buffer);
@@ -97,44 +92,6 @@ void RunDelayLoopWithCopiedObj(DelayManagement::IsDelayManager auto timer, const
 		std::osyncstream oss(std::cout);
 		oss << "Tick..." << timer << newl;
 		oss.emit();
-	}
-}
-
-void RunMultiThreadedTest()
-{
-	//waits for duration and then updates the timer obj with the new interval
-	auto RunDelayedTimerUpdate = [](auto& timer, const auto interval, const chron::milliseconds duration = chron::milliseconds(500))
-	{
-		std::this_thread::sleep_for(duration);
-		timer.Reset(interval);
-	};
-	// delay and update loop
-	auto DoDelayAndUpdateLoop = [&](auto& mtt)
-	{
-		std::osyncstream oss(std::cout);
-		std::shared_ptr<Thread_t> loopThread = std::make_shared<Thread_t>([&]() { RunDelayLoopWithRefObj(mtt, TickInterval); });
-		oss << "Running multi-threaded delay loop.. From thread: " << loopThread->get_id() << newl;
-		//so while the loopThread is running, it will update the delaymanager object with a new duration value
-		std::shared_ptr<Thread_t> updateThread = std::make_shared<Thread_t>([&]() { RunDelayedTimerUpdate(mtt, UpdatedDelay, TimeToWait); });
-		oss << "Running multi-threaded delay update.. From thread: " << updateThread->get_id() << newl;
-		oss.emit();
-		return std::make_pair(loopThread, updateThread); // pair of threads
-	};
-	//buffer to hold the pairs of threads so we can join them all back and wait.
-	std::vector<std::pair<SharedThreadType, SharedThreadType>> threadBuf;
-	std::vector<std::unique_ptr<DelayManagerSafe<>>> delayBuf;
-	for (size_t i{ 0 }; i < ThreadCount; ++i)
-	{
-		delayBuf.emplace_back(std::make_unique<DelayManagerSafe<>>(FirstDelay, true));
-		threadBuf.emplace_back(DoDelayAndUpdateLoop(*delayBuf.back()));
-	}
-	for (size_t i{ 0 }; i < threadBuf.size(); ++i)
-	{
-		const auto& bothThreads = threadBuf[i];
-		if (bothThreads.first->joinable())
-			bothThreads.first->join();
-		if (bothThreads.second->joinable())
-			bothThreads.second->join();
 	}
 }
 
