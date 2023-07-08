@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <ostream>
 #include <chrono>
 #include <mutex>
